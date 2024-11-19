@@ -26,21 +26,45 @@ namespace myTasker
             // Lier la collection au ListView
             TaskListView.ItemsSource = TaskList;
         }
-        public void ExportToExcel (ObservableCollection<TaskModel> tasks, string filePath)
+        public void ExportToExcel(ObservableCollection<TaskModel> tasks, string filePath)
         {
-            using ( var workbook = new XLWorkbook())
-            {
-                var worksheet = workbook.AddWorksheet("Taches");
+            XLWorkbook workbook;
 
-                worksheet.Cell(1, 1).Value = "Mes tâches";
-                worksheet.Cell(1, 1).Style.Font.Bold=true;
-                for (int i = 0; i < tasks.Count; i++)
-                {
-                    worksheet.Cell(i+2, 1).Value = tasks[i].Name;
-                }
-                workbook.SaveAs(filePath);
+            // Vérifie si le fichier existe
+            if (File.Exists(filePath))
+            {
+                // Charger le fichier existant
+                workbook = new XLWorkbook(filePath);
             }
+            else
+            {
+                // Créer un nouveau classeur si le fichier n'existe pas
+                workbook = new XLWorkbook();
+            }
+
+            // Vérifier si la feuille "Taches" existe
+            var worksheet = workbook.Worksheets.FirstOrDefault(ws => ws.Name == "Taches");
+            if (worksheet == null)
+            {
+                // Créer une nouvelle feuille si elle n'existe pas
+                worksheet = workbook.AddWorksheet("Taches");
+                worksheet.Cell(1, 1).Value = "Mes tâches";
+                worksheet.Cell(1, 1).Style.Font.Bold = true;
+            }
+
+            // Trouver la première ligne vide (en ignorant l'en-tête)
+            int firstEmptyRow = worksheet.LastRowUsed()?.RowNumber() + 1 ?? 2;
+
+            // Ajouter les nouvelles tâches à la feuille
+            foreach (var task in tasks)
+            {
+                worksheet.Cell(firstEmptyRow++, 1).Value = task.Name;
+            }
+
+            // Sauvegarder le fichier
+            workbook.SaveAs(filePath);
         }
+
         private void ReadFromExcel(string filePath, ObservableCollection<TaskModel> taskList)
         {
             // Vérifier que le fichier existe
@@ -89,6 +113,8 @@ namespace myTasker
                 TaskList.Add(new TaskModel { Name = TaskInput.Text });
                 // Réinitialiser le champ de texte
                 TaskInput.Clear();
+                string filePath = "D:\\GitProjects\\WPF\\Tasker\\src\\MesTâches.xlsx";
+                ExportToExcel(TaskList, filePath);
             }
             else
             {
