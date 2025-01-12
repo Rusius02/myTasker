@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "myTasker", "myTasker.csproj", "{6FFEB11F-7482-4F20-A1E9-BE73AE412F8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "myTasker", "myTasker.csproj", "{6FFEB11F-7482-4F20-A1E9-BE73AE412F8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "..\Domain\Domain.csproj", "{CECAD203-7531-4C00-8124-07D1D46AB1C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "..\Domain\Domain.csproj", "{CECAD203-7531-4C00-8124-07D1D46AB1C3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{EBE80AAF-FCDE-427A-AA36-9853E8EA8061}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
