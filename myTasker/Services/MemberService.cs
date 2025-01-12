@@ -39,4 +39,5 @@ public class MemberService
             await _memberRepository.DeleteAsync(member);
         }
     }
+
 }

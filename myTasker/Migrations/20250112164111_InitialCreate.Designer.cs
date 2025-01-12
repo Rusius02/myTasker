@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace myTasker.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250112112819_InitialCreate")]
+    [Migration("20250112164111_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

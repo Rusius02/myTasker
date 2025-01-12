@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace myTasker.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250112164705_MakeAssignedMemberIdNullable")]
+    partial class MakeAssignedMemberIdNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.36");
@@ -76,6 +78,7 @@ namespace myTasker.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("AssignedMemberId")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
@@ -112,16 +115,15 @@ namespace myTasker.Migrations
                     b.HasOne("Domain.Member", "AssignedMember")
                         .WithMany()
                         .HasForeignKey("AssignedMemberId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
-                    b.HasOne("Domain.Project", "Project")
+                    b.HasOne("Domain.Project", null)
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("AssignedMember");
-
-                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Domain.Project", b =>

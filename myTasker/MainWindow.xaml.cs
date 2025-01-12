@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using Domain;
+using myTasker.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -18,13 +19,20 @@ namespace myTasker
         public ObservableCollection<TaskItem> TaskList { get; set; }
         private readonly ProjectService _projectService;
         private readonly TaskItemService _taskItemService;
-        public MainWindow(ProjectService projectService, TaskItemService taskItemService)
+        private readonly MemberService _memberService;
+        public MainWindow(ProjectService projectService, TaskItemService taskItemService, MemberService memberService)
         {
             InitializeComponent();
             _projectService = projectService;
             _taskItemService = taskItemService;
+            _memberService = memberService;
+            var projectManagementControl = new ProjectManagement(_projectService);
+            var memberManagementControl = new MemberManagement(_memberService);
+            ProjectContainer.Children.Add(projectManagementControl);
+            MemberContainer.Children.Add(memberManagementControl);
             TaskList = new ObservableCollection<TaskItem>();
-
+            LoadTasks();
+            _memberService = memberService;
         }
 
         private async void LoadTasks()

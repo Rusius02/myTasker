@@ -1,5 +1,7 @@
 ﻿using Domain;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
+using System;
 
 public class AppDbContext : DbContext
 {
@@ -9,8 +11,15 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // Connexion à une base SQLite
-        optionsBuilder.UseSqlite("Data Source=ProjectManager.db");
+        string connectionString = "Data Source=D:\\GitProjects\\WPF\\Tasker\\src\\ProjectManager.db";
+
+        if (!System.IO.File.Exists("D:\\GitProjects\\WPF\\Tasker\\src\\ProjectManager.db"))
+        {
+            throw new FileNotFoundException($"Database file not found: {connectionString}");
+        }
+
+        Console.WriteLine($"Using database file: {connectionString}");
+        optionsBuilder.UseSqlite(connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +35,14 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(t => t.AssignedMemberId)
             .OnDelete(DeleteBehavior.SetNull);
+       
+        modelBuilder.Entity<TaskItem>()
+          .HasOne(t => t.Project) // Une tâche est associée à un projet
+          .WithMany(p => p.Tasks) // Un projet peut avoir plusieurs tâches
+          .HasForeignKey(t => t.ProjectId) // Clé étrangère
+          .OnDelete(DeleteBehavior.Cascade); // Comportement de suppression (optionnel)
+
+     
 
         // Configuration des clés primaires et autres contraintes
         modelBuilder.Entity<Project>(entity =>
