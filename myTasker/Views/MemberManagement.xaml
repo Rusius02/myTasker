@@ -1,27 +1,33 @@
 ﻿<UserControl x:Class="myTasker.Views.MemberManagement"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:myTasker.Views"
-        Height="Auto" Width="400">
-
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:myTasker.Views">
     <StackPanel Margin="10">
-        <TextBlock Text="Create a New Member" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+        <TextBlock Text="Creation d'un nouveau membre" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
-        <TextBox x:Name="MemberNameTextBox" Text="Member Name" Margin="0,5"/>
+        <TextBox x:Name="MemberNameTextBox" Text="Nom du membre" Margin="0,5"/>
         <TextBox x:Name="MemberEmailTextBox" Text="Email" Margin="0,5"/>
         <TextBox x:Name="MemberRoleTextBox" Text="Role" Margin="0,5"/>
 
-        <Button Content="Add Member" Click="AddMemberButton_Click" Margin="0,10"/>
+        <Button Content="Ajouter le membre" Click="AddMemberButton_Click" Margin="0,10"/>
 
         <ListView x:Name="MembersListView" Height="200" Margin="0,10">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Nom" DisplayMemberBinding="{Binding Name}" />
                     <GridViewColumn Header="Email" DisplayMemberBinding="{Binding Email}" />
                     <GridViewColumn Header="Role" DisplayMemberBinding="{Binding Role}" />
+                    <GridViewColumn Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="❌" Background="Red" Foreground="White" 
+                                        Click="DeleteMemberButton_Click" 
+                                        Tag="{Binding}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
     </StackPanel>
-
 </UserControl>

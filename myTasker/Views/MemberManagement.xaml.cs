@@ -1,9 +1,6 @@
-﻿using Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using Domain;
 
 namespace myTasker.Views
 {
@@ -24,13 +21,18 @@ namespace myTasker.Views
             MembersListView.ItemsSource = members;
         }
 
-        private void AddMemberButton_Click(object sender, RoutedEventArgs e)
+        private async void AddMemberButton_Click(object sender, RoutedEventArgs e)
         {
             var memberName = MemberNameTextBox.Text;
             var memberEmail = MemberEmailTextBox.Text;
             var memberRole = MemberRoleTextBox.Text;
 
-            // Vous pouvez ajouter ici une validation des champs si nécessaire
+            // Validation simple
+            if (string.IsNullOrWhiteSpace(memberName) || string.IsNullOrWhiteSpace(memberEmail) || string.IsNullOrWhiteSpace(memberRole))
+            {
+                MessageBox.Show("All fields are required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             var newMember = new Member
             {
@@ -39,8 +41,29 @@ namespace myTasker.Views
                 Role = memberRole
             };
 
-            _ = _memberService.AddMemberAsync(newMember);
+            await _memberService.AddMemberAsync(newMember);
             LoadMembers();
+
+            // Réinitialisation des champs
+            MemberNameTextBox.Text = string.Empty;
+            MemberEmailTextBox.Text = string.Empty;
+            MemberRoleTextBox.Text = string.Empty;
+        }
+
+        private async void DeleteMemberButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button deleteButton && deleteButton.Tag is Member member)
+            {
+                // Demande de confirmation
+                var result = MessageBox.Show($"Êtes-vous sûr de vouloir supprimer {member.Name} ?",
+                                             "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    await _memberService.DeleteMemberAsync(member.Id);
+                    LoadMembers();
+                }
+            }
         }
     }
 }
