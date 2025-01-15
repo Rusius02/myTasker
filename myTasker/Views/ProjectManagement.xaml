@@ -21,6 +21,15 @@
                     <GridViewColumn Header="Description" DisplayMemberBinding="{Binding Description}" />
                     <GridViewColumn Header="Start Date" DisplayMemberBinding="{Binding StartDate}" />
                     <GridViewColumn Header="End Date" DisplayMemberBinding="{Binding EndDate}" />
+                    <GridViewColumn Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="❌" Background="Red" Foreground="White" 
+                                        Click="DeleteProjectButton_Click" 
+                                        Tag="{Binding}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

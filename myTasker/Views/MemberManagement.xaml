@@ -3,15 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:myTasker.Views">
     <StackPanel Margin="10">
-        <TextBlock Text="Creation d'un nouveau membre" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+        <TextBlock Text="Gestion des membres" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
         <TextBox x:Name="MemberNameTextBox" Text="Nom du membre" Margin="0,5"/>
         <TextBox x:Name="MemberEmailTextBox" Text="Email" Margin="0,5"/>
         <TextBox x:Name="MemberRoleTextBox" Text="Role" Margin="0,5"/>
 
-        <Button Content="Ajouter le membre" Click="AddMemberButton_Click" Margin="0,10"/>
-
-        <ListView x:Name="MembersListView" Height="200" Margin="0,10">
+        <Button Click="SaveMemberButton_Click" Margin="0,10"
+        Width="150" Height="40">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Content" Value="Ajouter un membre" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                            <Setter Property="Content" Value="Modifier un membre" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <ListView x:Name="MembersListView" Height="200" Margin="0,10" SelectionChanged="MembersListView_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Nom" DisplayMemberBinding="{Binding Name}" />
@@ -20,9 +31,14 @@
                     <GridViewColumn Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="❌" Background="Red" Foreground="White" 
-                                        Click="DeleteMemberButton_Click" 
-                                        Tag="{Binding}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="🖉" Background="LightGray" Foreground="Black" 
+                                            Click="EditMemberButton_Click" 
+                                            Tag="{Binding}" Margin="0,0,5,0"/>
+                                    <Button Content="❌" Background="Red" Foreground="White" 
+                                            Click="DeleteMemberButton_Click" 
+                                            Tag="{Binding}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

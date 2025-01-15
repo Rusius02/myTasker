@@ -58,5 +58,20 @@ namespace myTasker.Views
             var projects = await _projectService.GetAllProjectsAsync();
             ProjectsListView.ItemsSource = projects;
         }
+        private async void DeleteProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button deleteButton && deleteButton.Tag is Project project)
+            {
+                // Demande de confirmation
+                var result = MessageBox.Show($"Êtes-vous sûr de vouloir supprimer {project.Name} ?",
+                                             "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    await _projectService.DeleteProjectAsync(project.Id);
+                    LoadProjects();
+                }
+            }
+        }
     }
 }
