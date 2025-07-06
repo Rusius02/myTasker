@@ -27,7 +27,10 @@
               SelectedValuePath="Id"
               Text="Sélectionnez un membre"/>
         <Button Content="Ajouter Tâche" Click="AddTaskButton_Click" Margin="10"/>
-            <ListView x:Name="TasksListView" Height="200" Margin="10">
+        <Button Content="Exporter les tâches" Click="ExportTasksButton_Click" Margin="10"/>
+
+
+        <ListView x:Name="TasksListView" Height="200" Margin="10">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" Width="50"/>

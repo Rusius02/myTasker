@@ -1,20 +1,15 @@
 ﻿using Domain;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using TaskStatus = Domain.TaskStatus;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.IO;
+using Microsoft.Win32;
+using System.Linq;
+using myTasker.Services;
 
 namespace myTasker.Views
 {
@@ -91,5 +86,52 @@ namespace myTasker.Views
                 }
             }
         }
+        private async void ExportTasksButton_Click(object sender, RoutedEventArgs e)
+        {
+            var tasks = await _taskItemService.GetAllTasksAsync();
+            if (tasks == null || !tasks.Any())
+            {
+                MessageBox.Show("Aucune tâche à exporter.");
+                return;
+            }
+
+            var saveDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                FileName = "taches_export",
+                Filter = "Fichier Excel (*.xlsx)|*.xlsx|Fichier CSV (*.csv)|*.csv",
+                DefaultExt = ".xlsx"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                ExportFormat format;
+                string extension = System.IO.Path.GetExtension(saveDialog.FileName).ToLower();
+
+                switch (extension)
+                {
+                    case ".xlsx":
+                        format = ExportFormat.Xlsx;
+                        break;
+                    case ".csv":
+                        format = ExportFormat.Csv;
+                        break;
+                    default:
+                        MessageBox.Show("Format non supporté.");
+                        return;
+                }
+
+                try
+                {
+                    var exporter = new ExportService();
+                    await exporter.ExportAsync(tasks, format, saveDialog.FileName);
+                    MessageBox.Show("Export terminé !");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erreur lors de l'export : {ex.Message}");
+                }
+            }
+        }
+
     }
 }
