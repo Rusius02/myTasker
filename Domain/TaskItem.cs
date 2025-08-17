@@ -11,7 +11,7 @@
         public int? AssignedMemberId { get; set; } // Nullable
         public Member? AssignedMember { get; set; }
         public int? ProjectId { get; set; } // Si la tâche n'est pas encore associée à un projet
-        public Project? Project { get; set; }
+        public Project? Project { get; set; } = null;
 
         public TaskItem()
         {

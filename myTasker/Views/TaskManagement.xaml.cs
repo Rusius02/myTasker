@@ -1,81 +1,107 @@
 ﻿using Domain;
+using myTasker.Services;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using TaskStatus = Domain.TaskStatus;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using System.IO;
-using Microsoft.Win32;
-using System.Linq;
-using myTasker.Services;
+using System.Windows.Data;
 
 namespace myTasker.Views
 {
-    /// <summary>
-    /// Interaction logic for TaskManagement.xaml
-    /// </summary>
     public partial class TaskManagement : UserControl
     {
         private readonly TaskItemService _taskItemService;
+        private readonly ProjectService _projectService;
+        private readonly MemberService _memberService;
+        private ObservableCollection<TaskItem> _tasks;
+        private ICollectionView _tasksView;
 
         public TaskManagement(TaskItemService taskItemService, ProjectService projectService, MemberService memberService)
         {
             InitializeComponent();
+
             _taskItemService = taskItemService;
-            LoadProjects(projectService);
-            LoadMembers(memberService);
+            _projectService = projectService;
+            _memberService = memberService;
+            LoadProjects();
+            LoadMembers();
             LoadTasks();
         }
 
         private async void LoadTasks()
         {
             var tasks = await _taskItemService.GetAllTasksAsync();
-            TasksListView.ItemsSource = new ObservableCollection<TaskItem>(tasks);
+            _tasks = new ObservableCollection<TaskItem>(tasks);
+            _tasksView = CollectionViewSource.GetDefaultView(_tasks);
+            TasksListView.ItemsSource = _tasksView;
         }
-
-        private async void LoadProjects(ProjectService projectService)
+        private async void LoadProjects()
         {
-            var projects = await projectService.GetAllProjectsAsync();
+            var projects = await _projectService.GetAllProjectsAsync();
+            ProjectFilterComboBox.ItemsSource = projects;
             ProjectComboBox.ItemsSource = projects;
         }
 
-        private async void LoadMembers(MemberService memberService)
+        private async void LoadMembers()
         {
-            var members = await memberService.GetAllMembersAsync();
+            var members = await _memberService.GetAllMembersAsync();
+            MemberFilterComboBox.ItemsSource = members;
             MemberComboBox.ItemsSource = members;
         }
+        private void ApplyFilters()
+        {
+            _tasksView.Filter = obj =>
+            {
+                if (obj is TaskItem task)
+                {
+                    bool projectMatch = ProjectFilterComboBox.SelectedItem == null || task.ProjectId == ((Project)ProjectFilterComboBox.SelectedItem).Id;
+                    bool memberMatch = MemberFilterComboBox.SelectedItem == null || task.AssignedMemberId == ((Member)MemberFilterComboBox.SelectedItem).Id;
+                    return projectMatch && memberMatch;
+                }
+                return false;
+            };
+            _tasksView.Refresh();
+        }
+        private void ProjectFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ApplyFilters();
+        }
 
-        // Événement du bouton Ajouter
+        private void MemberFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ApplyFilters();
+        }
+
         private async void AddTaskButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedProject = ProjectComboBox.SelectedItem as Project;
             var selectedMember = MemberComboBox.SelectedItem as Member;
+
+            var selectedStatus = Domain.TaskStatus.Pending;
 
             var task = new TaskItem
             {
                 Name = TaskNameTextBox.Text,
                 Description = TaskDescriptionTextBox.Text,
                 DueDate = TaskDueDatePicker.SelectedDate ?? DateTime.Now,
-                Status = TaskStatus.Pending, // Statut par défaut
-                ProjectId = selectedProject?.Id, 
+                Status = selectedStatus,
+                ProjectId = selectedProject?.Id,
                 Project = selectedProject,
                 AssignedMemberId = selectedMember?.Id,
                 AssignedMember = selectedMember,
             };
 
             await _taskItemService.AddTaskAsync(task);
-            MessageBox.Show("Tâche ajoutée !");
-
-            LoadTasks(); // Rafraîchir la liste des tâches
+            MessageBox.Show("Tâche ajoutée !");
+            LoadTasks();
         }
 
         private async void DeleteTaskButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button deleteButton && deleteButton.Tag is TaskItem taskItem)
             {
-                // Demande de confirmation
                 var result = MessageBox.Show($"Êtes-vous sûr de vouloir supprimer {taskItem.Name} ?",
                                              "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
@@ -84,6 +110,13 @@ namespace myTasker.Views
                     await _taskItemService.DeleteTaskAsync(taskItem.Id);
                     LoadTasks();
                 }
+            }
+        }
+        private async void TaskStatus_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox cb && cb.DataContext is TaskItem task)
+            {
+                await _taskItemService.UpdateTaskAsync(task);
             }
         }
         private async void ExportTasksButton_Click(object sender, RoutedEventArgs e)
@@ -132,6 +165,5 @@ namespace myTasker.Views
                 }
             }
         }
-
     }
 }
